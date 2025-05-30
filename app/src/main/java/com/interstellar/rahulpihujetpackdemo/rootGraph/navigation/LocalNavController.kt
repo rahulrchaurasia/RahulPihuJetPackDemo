@@ -1,0 +1,7 @@
+package com.interstellar.rahulpihujetpackdemo.rootGraph.navigation// Local NavController Provider
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.navigation.NavController
+
+val LocalNavController = staticCompositionLocalOf<NavController> {
+    error("No NavController found!")
+}

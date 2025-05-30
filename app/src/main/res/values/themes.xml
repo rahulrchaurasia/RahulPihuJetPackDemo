@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+<!--    Attribute	  :    Purpose / Where it's Used-->
+<!--    colorPrimary   :   Primary branding color — toolbar, FAB, buttons, etc.-->
+<!--    colorOnPrimary	:    Foreground content (text/icon) shown on top of colorPrimary-->
+<!--    colorPrimaryContainer: 	Used in elevated containers (like Cards, Dialogs)-->
+<!--    colorOnPrimaryContainer :	Text/icons shown on colorPrimaryContainer-->
+<!--    colorSurface	:  Background of surfaces like cards, sheets, app bar-->
+<!--    colorOnSurface	:  Text/icons shown on top of surface-->
+<!--    colorSurfaceVariant :	Alternative surface background (like elevated cards)-->
+<!--    colorOnSurfaceVariant:	Text/icons on colorSurfaceVariant-->
+<!--    android:colorBackground :	Base background of activity/window-->
+<!--    colorOnBackground :	Text on top of background-->
+<!--    android:statusBarColor:	Status bar background color-->
+<!--    android:windowLightStatusBar:	Whether status bar uses light (black) icons-->
+
+
+    <!-- FIXED THEME - Use Material3 Theme -->
+    <style name="Theme.RahulPihuJetPackDemo" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Primary colors -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/purple_100</item>
+        <item name="colorOnPrimaryContainer">@color/purple_900</item>
+
+        <!-- Surface colors -->
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/black</item>
+        <item name="colorSurfaceVariant">@color/gray_100</item>
+        <item name="colorOnSurfaceVariant">@color/gray_700</item>
+
+        <!-- Background -->
+        <item name="android:colorBackground">@color/white</item>
+        <item name="colorOnBackground">@color/black</item>
+
+        <!-- Status bar -->
+        <item name="android:statusBarColor">@color/purple_700</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>
