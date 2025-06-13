@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.interstellar.rahulpihujetpackdemo.rootGraph.graph.Dest
 import com.interstellar.rahulpihujetpackdemo.ui.components.customNavigationBar.CustomBottomNavigationBar
 import com.interstellar.rahulpihujetpackdemo.ui.components.customNavigationBar.model.BottomNavItem
 import com.interstellar.rahulpihujetpackdemo.ui.screen.home.CartScreen
@@ -52,21 +53,26 @@ fun MainApp() {
     val navItems = listOf(
         BottomNavItem(
             icon = Icons.Default.Home,
-            label = "Home"
+            label = "Home",
+            destination = Dest.Home  // ✅ Added missing destination
         ),
         BottomNavItem(
             icon = Icons.Default.FavoriteBorder,
-            label = "WishList"
+            label = "WishList",
+            destination = Dest.WishList  // ✅ Added missing destination
         ),
         BottomNavItem(
             icon = Icons.Default.ShoppingCart,
-            label = "Cart"
+            label = "Cart",
+            destination = Dest.Cart  // ✅ Added missing destination
         ),
         BottomNavItem(
             icon = Icons.Default.Person,
-            label = "Profile"
+            label = "Profile",
+            destination = Dest.Profile  // ✅ Added missing destination
         )
     )
+
 
     Scaffold(
         bottomBar = {

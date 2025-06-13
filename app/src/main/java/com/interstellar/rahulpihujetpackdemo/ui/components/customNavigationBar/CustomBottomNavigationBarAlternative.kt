@@ -42,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.interstellar.rahulpihujetpackdemo.rootGraph.graph.Dest
 import com.interstellar.rahulpihujetpackdemo.ui.components.customNavigationBar.model.BottomNavItem
 
 /*
@@ -112,10 +113,10 @@ fun CustomBottomNavigationBarAlternativePreview() {
     var selectedIndex by remember { mutableIntStateOf(0) }
 
     val navItems = listOf(
-        BottomNavItem(Icons.Default.Home, "Home"),
-        BottomNavItem(Icons.Default.Search, "WishList"),
-        BottomNavItem(Icons.Default.ShoppingCart, "Cart"),
-        BottomNavItem(Icons.Default.Person, "Profile")
+        BottomNavItem(Icons.Default.Home, "Home",destination = Dest.Home),
+        BottomNavItem(Icons.Default.Search, "WishList",destination = Dest.Home),
+        BottomNavItem(Icons.Default.ShoppingCart, "Cart",destination = Dest.Home),
+        BottomNavItem(Icons.Default.Person, "Profile",destination = Dest.Home)
     )
 
     MaterialTheme {

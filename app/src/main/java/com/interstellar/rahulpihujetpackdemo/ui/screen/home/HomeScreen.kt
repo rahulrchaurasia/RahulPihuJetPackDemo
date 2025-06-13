@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,9 +29,14 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun HomeScreen() {
+
+fun HomeScreen(
+    onNavigateToProducts: () -> Unit = {}
+) {
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxSize()
     ) {
         Text(
             text = "🏠 Home Screen",
@@ -44,6 +50,15 @@ fun HomeScreen() {
             color = Color.Gray,
             modifier = Modifier.padding(top = 8.dp)
         )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Button(
+            onClick = onNavigateToProducts,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text("Browse Products")
+        }
     }
 }
 
