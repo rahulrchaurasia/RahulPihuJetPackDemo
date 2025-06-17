@@ -1,5 +1,6 @@
 package com.interstellar.rahulpihujetpackdemo.ui.screen.product
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -106,6 +107,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 // Preview (optional)
 import androidx.compose.ui.tooling.preview.Preview
 import com.interstellar.rahulpihujetpackdemo.data.local.model.Product
+import com.interstellar.rahulpihujetpackdemo.rootGraph.navigation.AppDataManager
+import com.interstellar.rahulpihujetpackdemo.rootGraph.router.HomeRoutes
 import com.interstellar.rahulpihujetpackdemo.ui.components.dialog.CommonAlertDialog
 
 // Serialization (for Product data class)
@@ -116,26 +119,39 @@ import kotlinx.serialization.Serializable
 @Composable
 fun ProductDetailScreen(
     productId: String,
-    onAddToCart: (String, String, String) -> Unit,
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    appDataManager: AppDataManager, // ✅ Add this parameter,
+    onNavigateToCart: () -> Unit = {} // ✅ NEW: Direct cart navigation
 ) {
+
+    // ✅ Custom back handling for specific screens
+//    BackHandler(enabled = true) {
+//        onBackPress()
+//    }
     // Mock product data based on ID
     val product = remember(productId) {
-        Product(
+        sampleProducts.find { it.id == productId } ?: Product(
             id = productId,
-            name = "Product $productId",
-            price = "$${(productId.toIntOrNull() ?: 1) * 100}",
-            category = "Electronics",
-            description = "This is a detailed description of product $productId with all the amazing features and specifications."
+            name = "Unknown Product",
+            price = "$0",
+            category = "Unknown",
+            description = "Product not found in our catalog."
         )
     }
 
-    var quantity by remember { mutableIntStateOf(1) }
+
+    // Cart state
+    val cartItems by appDataManager.cartItems.collectAsState()
+    val existingCartItem = cartItems.find { it.id == productId }
+    val isInCart = existingCartItem != null
+
+    // UI state
+   // var quantity by remember { mutableIntStateOf(1) }
+    var quantity by remember(existingCartItem?.quantity) {
+        mutableIntStateOf(existingCartItem?.quantity ?: 1)
+    }
     var isFavorite by remember { mutableStateOf(false) }
-
-    // ✅ ONLY ADD THIS - Dialog state
     var showAddToCartDialog by remember { mutableStateOf(false) }
-
 
     Scaffold(
         topBar = {
@@ -147,60 +163,139 @@ fun ProductDetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(
-                        onClick = { isFavorite = !isFavorite }
+                    // ✅ FIXED: Reduced spacing between cart and favorite icons
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy((2).dp), // ✅ Reduced spacing
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = "Favorite",
-                            tint = if (isFavorite) Color.Red else MaterialTheme.colorScheme.onSurface
-                        )
+                        // Show cart item count if items exist
+                        val cartCount by appDataManager.cartCount.collectAsState()
+                        if (cartCount > 0) {
+                            BadgedBox(
+                                badge = {
+                                    Badge(
+                                        modifier = Modifier.offset(x = (-8).dp, y = 4.dp) // ✅ Move badge closer to cart icon
+
+                                    ) {
+                                        Text(cartCount.toString())
+                                    }
+                                },
+
+                            ) {
+                                IconButton(
+                                    onClick = {
+                                        // Navigate to cart
+                                        onNavigateToCart() // ✅ Use new navigation function
+                                    }
+                                ) {
+                                    Icon(Icons.Default.ShoppingCart, contentDescription = "Cart")
+                                }
+                            }
+                        }
+
+                        IconButton(
+                            onClick = { isFavorite = !isFavorite }
+                        ) {
+                            Icon(
+                                imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                contentDescription = "Favorite",
+                                tint = if (isFavorite) Color.Red else MaterialTheme.colorScheme.onSurface
+                            )
+                        }
                     }
                 }
             )
         },
         bottomBar = {
-            // Bottom Action Bar
+            // ✅ FIXED Bottom Action Bar - Layout corrected
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
                 shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
             ) {
-                Row(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp)
-                        .windowInsetsPadding(WindowInsets.navigationBars),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        .windowInsetsPadding(WindowInsets.navigationBars)
                 ) {
 
-                    OutlinedButton(
-                        onClick = { /* Add to wishlist */ },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.FavoriteBorder,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Wishlist")
+                    // Show existing cart item info
+                    if (isInCart) {
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.secondaryContainer
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    Icons.Default.Info,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Already in cart: ${existingCartItem?.quantity} items",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(12.dp))
                     }
 
-                    Button(
-                        onClick = {
-                           // onAddToCart(product.id, product.name, product.price)
-                            showAddToCartDialog = true
-                        },
-                        modifier = Modifier.weight(1f)
+                    // ✅ FIXED Row layout - buttons now visible
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.ShoppingCart,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Add to Cart")
+
+                        // ✅ Wishlist button - now properly sized
+                        OutlinedButton(
+                            onClick = {
+                                // ✅ TODO: Add to wishlist functionality
+                                isFavorite = !isFavorite
+                            },
+                            modifier = Modifier.size(48.dp), // ✅ Fixed size instead of aspectRatio
+                            contentPadding = PaddingValues(8.dp)
+                        ) {
+                            Icon(
+                                imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                contentDescription = "Add to Wishlist",
+                                modifier = Modifier.size(20.dp),
+                                tint = if (isFavorite) Color.Red else MaterialTheme.colorScheme.primary
+                            )
+                        }
+
+                        // ✅ Add space between buttons
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        // ✅ Add to Cart button - now properly sized
+                        Button(
+                            onClick = {
+                                showAddToCartDialog = true
+                            },
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.ShoppingCart,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = if (isInCart) "Add More" else "Add to Cart",
+                                fontSize = 14.sp
+                            )
+                        }
                     }
                 }
             }
@@ -229,10 +324,17 @@ fun ProductDetailScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ShoppingBag,
+                        imageVector = when (product.category) {
+                            "Phones" -> Icons.Default.Phone
+                            "Laptops" -> Icons.Default.Computer
+                            "Tablets" -> Icons.Default.Tablet
+                            "Audio" -> Icons.Default.Headphones
+                            "Wearables" -> Icons.Default.Watch
+                            else -> Icons.Default.ShoppingBag
+                        },
                         contentDescription = null,
                         modifier = Modifier.size(100.dp),
-                        tint = Color.Gray
+                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
                     )
                 }
             }
@@ -241,6 +343,22 @@ fun ProductDetailScreen(
             Column(
                 modifier = Modifier.padding(16.dp)
             ) {
+
+                // Category Badge
+                Text(
+                    text = product.category,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .background(
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                            RoundedCornerShape(6.dp)
+                        )
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
                 Text(
                     text = product.name,
                     style = MaterialTheme.typography.headlineMedium,
@@ -275,36 +393,106 @@ fun ProductDetailScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Quantity Selector
-                Row(
+                Card(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Quantity:",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                     )
-
+                ) {
                     Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconButton(
-                            onClick = { if (quantity > 1) quantity-- }
-                        ) {
-                            Icon(Icons.Default.Remove, contentDescription = "Decrease")
-                        }
-
                         Text(
-                            text = quantity.toString(),
+                            text = "Quantity:",
                             style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(horizontal = 16.dp)
+                            fontWeight = FontWeight.Medium
                         )
 
-                        IconButton(
-                            onClick = { quantity++ }
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(Icons.Default.Add, contentDescription = "Increase")
+                            FilledTonalIconButton(
+                                onClick = { if (quantity > 1) quantity-- }
+                            ) {
+                                Icon(Icons.Default.Remove, contentDescription = "Decrease")
+                            }
+
+                            Text(
+                                text = quantity.toString(),
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 24.dp)
+                            )
+
+                            FilledTonalIconButton(
+                                onClick = { quantity++ }
+                            ) {
+                                Icon(Icons.Default.Add, contentDescription = "Increase")
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // Features Section
+                Text(
+                    text = "Features",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+               // val productWithFeatures = products
+                val features = when (product.category) {
+                    "Phones" -> listOf(
+                        "Latest Processor",
+                        "High-Resolution Camera",
+                        "All-Day Battery Life",
+                        "Water Resistant",
+                        "Fast Charging"
+                    )
+
+                    "Laptops" -> listOf(
+                        "Powerful Performance",
+                        "High-Resolution Display",
+                        "Long Battery Life",
+                        "Premium Build Quality",
+                        "Fast SSD Storage"
+                    )
+
+                    else -> listOf(
+                        "Premium Quality Materials",
+                        "Latest Technology",
+                        "1 Year Warranty",
+                        "Free Shipping",
+                        "30-Day Return Policy"
+                    )
+                }
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    features.forEach { feature ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = null,
+                                modifier = Modifier.size(16.dp),
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = feature,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
                         }
                     }
                 }
@@ -312,32 +500,44 @@ fun ProductDetailScreen(
         }
     }
 
+
+
     // ✅ ADD THIS - Alert Dialog
     CommonAlertDialog(
         showDialog = showAddToCartDialog,
         onDismiss = { showAddToCartDialog = false },
         title = "Add to Cart",
-        message = "Do you want to add \"${product.name}\" (Qty: $quantity) to your cart for ${product.price}?",
-        confirmButtonText = "Add to Cart",
+        message = buildString {
+            append("Add \"${product.name}\" (Qty: $quantity) to your cart for ${product.price}?")
+            if (isInCart) {
+                append("\n\nThis will add $quantity more items to your existing ${existingCartItem?.quantity} items.")
+            }
+        },
+        confirmButtonText = if (isInCart) "Add More" else "Add to Cart",
         cancelButtonText = "Cancel",
         onConfirm = {
-            onAddToCart(product.id, product.name, product.price)
+            // Add to cart using AppDataManager
+            appDataManager.addToCart(product, quantity)
+
+            // Navigate to cart detail to show added item
+            onNavigateToCart()
         },
         icon = Icons.Default.ShoppingCart
     )
 }
-@Preview(showBackground = true)
-@Composable
-fun ProductDetailScreenPreview() {
-    MaterialTheme {
-        ProductDetailScreen(
-            productId = "product_1",
-            onAddToCart = { id, name, price ->
-                println("Added to cart: $id, $name, $price")
-            },
-            onBackPressed = {
-                println("Back pressed")
-            }
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun ProductDetailScreenPreview() {
+//    MaterialTheme {
+//        ProductDetailScreen(
+//            productId = "product_1",
+//            onAddToCart = { id, name, price ->
+//                println("Added to cart: $id, $name, $price")
+//            },
+//            onBackPressed = {
+//                println("Back pressed")
+//            },
+//            appDataManager = appDataManager
+//        )
+//    }
+//}

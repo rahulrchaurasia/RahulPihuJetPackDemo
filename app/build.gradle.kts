@@ -3,6 +3,9 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     kotlin("plugin.serialization") version "1.9.10"
+    // ✅ ADD THESE HILT PLUGINS
+    id("dagger.hilt.android.plugin")
+    id("kotlin-kapt") // For annotation processing
 }
 
 android {
@@ -71,6 +74,19 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
 
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.tv.material)
+
+    // ✅ ADD HILT DEPENDENCIES HERE
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+
+    // ✅ Hilt Compose integration
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    // ✅ Optional: Hilt testing (if you need testing)
+    testImplementation(libs.hilt.android.testing)
+    kaptTest(libs.hilt.compiler)
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

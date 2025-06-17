@@ -13,7 +13,11 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.interstellar.rahulpihujetpackdemo.data.local.model.CartItem
+import com.interstellar.rahulpihujetpackdemo.data.local.model.Product
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,50 +26,32 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import javax.inject.Inject
 
-//class AuthManager {
-//    private val _isLoggedIn = MutableStateFlow(false)
-//    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
-//
-//    private val _isFirstTime = MutableStateFlow(true)
-//    val isFirstTime: StateFlow<Boolean> = _isFirstTime.asStateFlow()
-//
-//    fun login() {
-//        _isLoggedIn.value = true
-//        _isFirstTime.value = false
-//    }
-//
-//    fun logout() {
-//        _isLoggedIn.value = false
-//    }
-//
-//    fun setNotFirstTime() {
-//        _isFirstTime.value = false
-//    }
-//
-//    fun checkLoginState() {
-//        // Simulate checking SharedPreferences/DataStore
-//        // In real app: check stored auth token
-//        _isLoggedIn.value = false
-//        _isFirstTime.value = true
-//    }
-//}
 
-// DataStore extension
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "auth_preferences")
+//val Context.appDataStore: DataStore<Preferences> by preferencesDataStore(name = "app_preferences")
 
-class AppDataManager(private val context: Context) {
+class AppDataManager @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val dataStore: DataStore<Preferences> // ✅ Hilt injects DataStore
+) {
 
     // Keys for DataStore
     private object PreferencesKeys {
+        // Auth Keys
         val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
         val IS_FIRST_TIME = booleanPreferencesKey("is_first_time")
         val USER_TOKEN = stringPreferencesKey("user_token")
         val USER_EMAIL = stringPreferencesKey("user_email")
         val USER_NAME = stringPreferencesKey("user_name")
+        // Cart Keys
+        val CART_ITEMS = stringPreferencesKey("cart_items")
+        val CART_COUNT = intPreferencesKey("cart_count")
     }
 
-    // In-memory state for UI reactivity
+    // Auth State
     private val _isLoggedIn = MutableStateFlow(false)
     val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
 
@@ -75,33 +61,52 @@ class AppDataManager(private val context: Context) {
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+
+    // Cart State
+    private val _cartItems = MutableStateFlow<List<CartItem>>(emptyList())
+    val cartItems: StateFlow<List<CartItem>> = _cartItems.asStateFlow()
+
+    private val _cartCount = MutableStateFlow(0)
+    val cartCount: StateFlow<Int> = _cartCount.asStateFlow()
+
+    private val _cartTotal = MutableStateFlow(0.0)
+    val cartTotal: StateFlow<Double> = _cartTotal.asStateFlow()
+
+
     // Coroutine scope for async operations
     private val scope = CoroutineScope(Dispatchers.IO)
 
     init {
         // Load saved state on initialization
-        loadAuthState()
+        loadAppState()
     }
 
     /**
      * Load authentication state from DataStore
      */
-    private fun loadAuthState() {
+    private fun loadAppState() {
         scope.launch {
             try {
-                val preferences = context.dataStore.data.first()
+                val preferences = dataStore.data.first()
 
+                // Load Auth State
                 val savedIsLoggedIn = preferences[PreferencesKeys.IS_LOGGED_IN] ?: false
                 val savedIsFirstTime = preferences[PreferencesKeys.IS_FIRST_TIME] ?: true
+
+                // Load Cart State
+                val cartJson = preferences[PreferencesKeys.CART_ITEMS] ?: "[]"
+                val cartItems = Json.decodeFromString<List<CartItem>>(cartJson)
 
                 // Update in-memory state
                 _isLoggedIn.value = savedIsLoggedIn
                 _isFirstTime.value = savedIsFirstTime
+                _cartItems.value = cartItems
+                updateCartMetrics()
                 _isLoading.value = false
 
-                println("🔍 AuthManager: Loaded state - isLoggedIn: $savedIsLoggedIn, isFirstTime: $savedIsFirstTime")
+                println("🔍 AppDataManager: Loaded state - Auth: $savedIsLoggedIn, Cart items: ${cartItems.size}")
             } catch (e: Exception) {
-                println("❌ AuthManager: Error loading state - ${e.message}")
+                println("❌ AppDataManager: Error loading state - ${e.message}")
                 _isLoading.value = false
             }
         }
@@ -113,7 +118,7 @@ class AppDataManager(private val context: Context) {
     fun login(userEmail: String = "", userToken: String = "") {
         scope.launch {
             try {
-                context.dataStore.edit { preferences ->
+                dataStore.edit { preferences ->
                     preferences[PreferencesKeys.IS_LOGGED_IN] = true
                     preferences[PreferencesKeys.IS_FIRST_TIME] = false
                     if (userEmail.isNotBlank()) {
@@ -124,16 +129,15 @@ class AppDataManager(private val context: Context) {
                     }
                 }
 
-                // Update in-memory state
                 _isLoggedIn.value = true
                 _isFirstTime.value = false
-
-                println("✅ AuthManager: User logged in successfully")
+                println("✅ AppDataManager: User logged in successfully")
             } catch (e: Exception) {
-                println("❌ AuthManager: Login error - ${e.message}")
+                println("❌ AppDataManager: Login error - ${e.message}")
             }
         }
     }
+
 
     /**
      * Logout user and clear DataStore
@@ -141,20 +145,21 @@ class AppDataManager(private val context: Context) {
     fun logout() {
         scope.launch {
             try {
-                context.dataStore.edit { preferences ->
+                dataStore.edit { preferences ->
                     preferences[PreferencesKeys.IS_LOGGED_IN] = false
-                    // Keep isFirstTime as false (user has seen welcome screen)
-                    // Clear sensitive data
                     preferences.remove(PreferencesKeys.USER_TOKEN)
                     preferences.remove(PreferencesKeys.USER_EMAIL)
+                    // Clear cart on logout
+                    preferences[PreferencesKeys.CART_ITEMS] = "[]"
+                    preferences[PreferencesKeys.CART_COUNT] = 0
                 }
 
-                // Update in-memory state
                 _isLoggedIn.value = false
-
-                println("✅ AuthManager: User logged out successfully")
+                _cartItems.value = emptyList()
+                updateCartMetrics()
+                println("✅ AppDataManager: User logged out successfully")
             } catch (e: Exception) {
-                println("❌ AuthManager: Logout error - ${e.message}")
+                println("❌ AppDataManager: Logout error - ${e.message}")
             }
         }
     }
@@ -165,15 +170,13 @@ class AppDataManager(private val context: Context) {
     fun setNotFirstTime() {
         scope.launch {
             try {
-                context.dataStore.edit { preferences ->
+                dataStore.edit { preferences ->
                     preferences[PreferencesKeys.IS_FIRST_TIME] = false
                 }
-
                 _isFirstTime.value = false
-
-                println("✅ AuthManager: Set not first time")
+                println("✅ AppDataManager: Set not first time")
             } catch (e: Exception) {
-                println("❌ AuthManager: setNotFirstTime error - ${e.message}")
+                println("❌ AppDataManager: setNotFirstTime error - ${e.message}")
             }
         }
     }
@@ -183,7 +186,7 @@ class AppDataManager(private val context: Context) {
      */
     suspend fun hasValidToken(): Boolean {
         return try {
-            val preferences = context.dataStore.data.first()
+            val preferences = dataStore.data.first()
             val token = preferences[PreferencesKeys.USER_TOKEN]
             !token.isNullOrBlank()
         } catch (e: Exception) {
@@ -195,7 +198,7 @@ class AppDataManager(private val context: Context) {
      * Get user email
      */
     fun getUserEmail(): Flow<String> {
-        return context.dataStore.data.map { preferences ->
+        return dataStore.data.map { preferences ->
             preferences[PreferencesKeys.USER_EMAIL] ?: ""
         }
     }
@@ -205,38 +208,143 @@ class AppDataManager(private val context: Context) {
      */
     suspend fun getUserToken(): String {
         return try {
-            val preferences = context.dataStore.data.first()
+            val preferences = dataStore.data.first()
             preferences[PreferencesKeys.USER_TOKEN] ?: ""
         } catch (e: Exception) {
             ""
         }
     }
 
-    /**
-     * Clear all data (for app reset)
-     */
-    fun clearAllData() {
+
+    fun checkLoginState() {
+        loadAppState()
+    }
+
+
+
+    //////
+
+    private fun updateCartMetrics() {
+        val items = _cartItems.value
+        _cartCount.value = items.sumOf { it.quantity }
+        _cartTotal.value = items.sumOf { it.priceValue * it.quantity }
+    }
+
+    private suspend fun saveCartToDataStore() {
+        try {
+            val cartJson = Json.encodeToString(_cartItems.value)
+            dataStore.edit { preferences ->
+                preferences[PreferencesKeys.CART_ITEMS] = cartJson
+                preferences[PreferencesKeys.CART_COUNT] = _cartCount.value
+            }
+        } catch (e: Exception) {
+            println("❌ AppDataManager: Error saving cart - ${e.message}")
+        }
+    }
+
+    fun addToCart(product: Product, quantity: Int = 1) {
         scope.launch {
             try {
-                context.dataStore.edit { preferences ->
-                    preferences.clear()
+                val currentItems = _cartItems.value.toMutableList()
+                val existingItemIndex = currentItems.indexOfFirst { it.id == product.id }
+
+                // Returns INDEX of first match, or -1 if not found
+                if (existingItemIndex != -1) {   // here when we find item {since we use ! operator
+                    val existingItem = currentItems[existingItemIndex]
+
+
+                        // ✅ Replace existing quantity (for ProductDetail updates)
+                        currentItems[existingItemIndex] = existingItem.copy(
+                            quantity = quantity
+                        )
+                        println("✅ Cart: Replaced ${product.name} quantity to $quantity")
+
+                } else {
+                    // Add new item
+                    val cartItem = CartItem(
+                        id = product.id,
+                        name = product.name,
+                        price = product.price,
+                        priceValue = product.price.replace("$", "").toDoubleOrNull() ?: 0.0,
+                        quantity = quantity,
+                        category = product.category
+                    )
+                    currentItems.add(cartItem)
                 }
 
-                _isLoggedIn.value = false
-                _isFirstTime.value = true
+                _cartItems.value = currentItems
+                updateCartMetrics()
+                saveCartToDataStore()
 
-                println("✅ AuthManager: All data cleared")
+                println("✅ Cart: Added ${product.name} (qty: $quantity)")
             } catch (e: Exception) {
-                println("❌ AuthManager: Clear data error - ${e.message}")
+                println("❌ Cart: Error adding item - ${e.message}")
             }
         }
     }
 
-    /**
-     * Legacy method for compatibility (deprecated)
-     */
-    @Deprecated("Use loadAuthState() instead")
-    fun checkLoginState() {
-        loadAuthState()
+    fun removeFromCart(productId: String) {
+        scope.launch {
+            try {
+                val currentItems = _cartItems.value.toMutableList()
+                currentItems.removeAll { it.id == productId }
+
+                _cartItems.value = currentItems
+                updateCartMetrics()
+                saveCartToDataStore()
+
+                println("✅ Cart: Removed product $productId")
+            } catch (e: Exception) {
+                println("❌ Cart: Error removing item - ${e.message}")
+            }
+        }
     }
+
+    fun updateCartItemQuantity(productId: String, newQuantity: Int) {
+        scope.launch {
+            try {
+                if (newQuantity <= 0) {
+                    removeFromCart(productId)
+                    return@launch
+                }
+
+                val currentItems = _cartItems.value.toMutableList()
+                val itemIndex = currentItems.indexOfFirst { it.id == productId }
+
+                if (itemIndex != -1) {
+                    currentItems[itemIndex] = currentItems[itemIndex].copy(quantity = newQuantity)
+                    _cartItems.value = currentItems
+                    updateCartMetrics()
+                    saveCartToDataStore()
+
+                    println("✅ Cart: Updated quantity for $productId to $newQuantity")
+                }
+            } catch (e: Exception) {
+                println("❌ Cart: Error updating quantity - ${e.message}")
+            }
+        }
+    }
+
+    fun clearCart() {
+        scope.launch {
+            try {
+                _cartItems.value = emptyList()
+                updateCartMetrics()
+                saveCartToDataStore()
+                println("✅ Cart: Cleared all items")
+            } catch (e: Exception) {
+                println("❌ Cart: Error clearing cart - ${e.message}")
+            }
+        }
+    }
+
+    fun getCartItem(productId: String): CartItem? {
+        return _cartItems.value.find { it.id == productId }
+    }
+
+    fun isInCart(productId: String): Boolean {
+        return _cartItems.value.any { it.id == productId }
+    }
+
+
 }

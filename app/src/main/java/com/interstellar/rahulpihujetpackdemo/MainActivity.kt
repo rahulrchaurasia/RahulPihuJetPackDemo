@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -13,6 +14,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.interstellar.rahulpihujetpackdemo.rootGraph.graph.ParentGraph.RootNavGraph
 import com.interstellar.rahulpihujetpackdemo.rootGraph.navigation.AppDataManager
@@ -20,27 +22,27 @@ import com.interstellar.rahulpihujetpackdemo.rootGraph.navigation.LocalNavContro
 import com.interstellar.rahulpihujetpackdemo.rootGraph.router.AuthRoutes
 import com.interstellar.rahulpihujetpackdemo.rootGraph.router.HomeRoutes
 import com.interstellar.rahulpihujetpackdemo.ui.theme.RahulPihuJetPackDemoTheme
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+
+@AndroidEntryPoint // ✅ Add this annotation
 class MainActivity : ComponentActivity() {
 
-    private lateinit var authManager: AppDataManager
+    @Inject
+    lateinit var appDataManager: AppDataManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // Initialize AuthManager with application context
-        authManager = AppDataManager(applicationContext)
+
+       // ✅ Hilt injects AppDataManager
 
         enableEdgeToEdge()
         setContent {
             RahulPihuJetPackDemoTheme {
 
-//                    Surface(
-//                        modifier = Modifier.fillMaxSize(),
-//                        color = MaterialTheme.colorScheme.background
-//                    ) {
-//                        MainApp()
-//                    }
 
                 val navController = rememberNavController()
 
@@ -48,35 +50,40 @@ class MainActivity : ComponentActivity() {
                 CompositionLocalProvider(LocalNavController provides navController) {
 
                     // Handle back press behavior
-                    BackHandler(enabled = true) {
-                        val currentRoute = navController.currentBackStackEntry?.destination?.route
-                        when (currentRoute) {
-                            HomeRoutes.Main.route -> {
-                                // Close app if on main home screen
-                                finish()
-                            }
-                            AuthRoutes.Login.route -> {
-                                // Close app if on login screen
-                                finish()
-                            }
-                            AuthRoutes.Welcome.route -> {
-                                // Close app if on welcome screen
-                                finish()
-                            }
-                            else -> {
-                                navController.popBackStack()
-                            }
-                        }
-                    }
+//                    BackHandler(enabled = true) {
+//                        val currentRoute = navController.currentBackStackEntry?.destination?.route
+//                        when (currentRoute) {
+//                            HomeRoutes.Main.route -> {
+//                                // Show "Press back again to exit" or confirmation dialog
+//                                showExitConfirmation()
+//                            }
+//                            AuthRoutes.Login.route,
+//                            AuthRoutes.Welcome.route -> {
+//                                // Close app for these screens
+//                                finish()
+//                            }
+//                            else -> {
+//                                // Go back for other screens
+//                                if (navController.previousBackStackEntry != null) {
+//                                    navController.popBackStack()
+//                                } else {
+//                                    finish()
+//                                }
+//                            }
+//                        }
+//                    }
 
                     RootNavGraph(
                         navController = navController,
-                        authManager = authManager
+                        authManager = appDataManager // // ✅ Pass to RootNavGraph
                     )
                 }
             }
         }
     }
+
+
+
 }
 
 @Composable

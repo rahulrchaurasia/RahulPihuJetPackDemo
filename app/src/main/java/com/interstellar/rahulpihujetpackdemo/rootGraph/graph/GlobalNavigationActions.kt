@@ -34,11 +34,13 @@ class GlobalNavigationActions(private val navController: NavHostController) {
     fun navigateToProductDetail(productId: String) {
         navController.navigate(Dest.ProductDetail(productId))
     }
-    
-    fun navigateToCartDetail(productId: String, productName: String, productPrice: String) {
-        navController.navigate(Dest.CartDetail(productId, productName, productPrice))
+
+
+
+    fun navigateToCart() {
+        // ✅ NEW: Direct navigation to cart
+        navController.navigate(Dest.CartDetail("", "", ""))
     }
-    
     // Generic Navigation
     fun navigateTo(destination: Dest) {
         navController.navigate(destination)
