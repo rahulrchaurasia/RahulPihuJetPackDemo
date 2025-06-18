@@ -8,10 +8,26 @@ import com.interstellar.rahulpihujetpackdemo.rootGraph.graph.Dest
 import com.interstellar.rahulpihujetpackdemo.rootGraph.graph.GlobalNavigationActions
 import com.interstellar.rahulpihujetpackdemo.rootGraph.navigation.AppDataManager
 
-import com.interstellar.rahulpihujetpackdemo.ui.MainHomeScreen
+import com.interstellar.rahulpihujetpackdemo.MainScreen
 import com.interstellar.rahulpihujetpackdemo.ui.screen.cart.CartDetailScreen
 import com.interstellar.rahulpihujetpackdemo.ui.screen.product.ProductDetailScreen
 import com.interstellar.rahulpihujetpackdemo.ui.screen.product.ProductsScreen
+/*
+   ***************************************************
+    Current Navigation Architecture
+    1. Root Navigation (Global)
+    kotlinRootNavGraph -> NavHost with globalActions
+    ├── Splash
+    ├── Auth (Welcome, Login, Register)
+    └── MainHome (Contains bottom navigation)
+    2. Bottom Navigation (Local)
+    kotlinMainApp -> Manual tab switching with selectedIndex
+    ├── Home
+    ├── WishList
+    ├── Cart
+    └── Profile
+    ***************************************************
+ */
 
 fun NavGraphBuilder.mainNavigation(
     globalActions: GlobalNavigationActions,
@@ -23,7 +39,7 @@ fun NavGraphBuilder.mainNavigation(
         enterTransition = { NavigationAnimations.slideInRight },
         exitTransition = { NavigationAnimations.slideOutLeft }
     ) {
-        MainHomeScreen(
+        MainScreen(
             globalActions = globalActions,
             authManager = appDataManager
         )

@@ -11,14 +11,28 @@ import com.interstellar.rahulpihujetpackdemo.rootGraph.graph.ChildGraph.mainNavi
 import com.interstellar.rahulpihujetpackdemo.rootGraph.navigation.AppDataManager
 
 import com.interstellar.rahulpihujetpackdemo.ui.screen.SplashScreen
+/*
 
+Current Navigation Architecture
+1. Root Navigation (Global)
+kotlinRootNavGraph -> NavHost with globalActions
+├── Splash
+├── Auth (Welcome, Login, Register)
+└── MainHome (Contains bottom navigation)
+2. Bottom Navigation (Local)
+kotlinMainApp -> Manual tab switching with selectedIndex
+├── Home
+├── WishList
+├── Cart
+└── Profile
+ */
 @Composable
 fun RootNavGraph(
     navController: NavHostController,
-    authManager: AppDataManager
+    appDataManager: AppDataManager
 ) {
-    val isLoggedIn by authManager.isLoggedIn.collectAsState()
-    val isFirstTime by authManager.isFirstTime.collectAsState()
+    val isLoggedIn by appDataManager.isLoggedIn.collectAsState()
+    val isFirstTime by appDataManager.isFirstTime.collectAsState()
 
     val globalActions = remember { GlobalNavigationActions(navController) }
 
@@ -36,7 +50,7 @@ fun RootNavGraph(
         ) {
             SplashScreen(
                 onSplashComplete = {
-                    authManager.checkLoginState()
+                    appDataManager.checkLoginState()
                     val destination = when {
                         isLoggedIn -> Dest.MainHome
                         else -> Dest.Welcome
@@ -48,9 +62,9 @@ fun RootNavGraph(
         }
 
         // Auth Graph - Now properly defined
-        authNavigation(globalActions, authManager)
+        authNavigation(globalActions, appDataManager)
 
         // Main App Graph - Now properly defined
-        mainNavigation(globalActions, authManager)
+        mainNavigation(globalActions, appDataManager)
     }
 }

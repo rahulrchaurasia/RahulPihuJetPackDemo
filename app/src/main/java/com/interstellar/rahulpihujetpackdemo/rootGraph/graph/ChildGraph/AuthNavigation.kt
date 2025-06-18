@@ -10,6 +10,22 @@ import com.interstellar.rahulpihujetpackdemo.ui.screen.LoginScreen
 
 import com.interstellar.rahulpihujetpackdemo.ui.screen.WelcomeScreen
 
+/*
+Current Navigation Architecture
+1. Root Navigation (Global)
+kotlinRootNavGraph -> NavHost with globalActions
+├── Splash
+├── Auth (Welcome, Login, Register)
+└── MainHome (Contains bottom navigation)
+2. Bottom Navigation (Local)
+kotlinMainApp -> Manual tab switching with selectedIndex
+├── Home
+├── WishList
+├── Cart
+└── Profile
+ */
+
+
 fun NavGraphBuilder.authNavigation(
     globalActions: GlobalNavigationActions,
     authManager: AppDataManager

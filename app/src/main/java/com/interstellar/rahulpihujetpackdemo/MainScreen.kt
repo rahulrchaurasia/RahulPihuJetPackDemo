@@ -1,4 +1,4 @@
-package com.interstellar.rahulpihujetpackdemo.ui
+package com.interstellar.rahulpihujetpackdemo
 
 // 8. Main Home Screen with Bottom Navigation
 import android.app.Activity
@@ -22,7 +22,6 @@ import com.interstellar.rahulpihujetpackdemo.rootGraph.navigation.AppDataManager
 
 import com.interstellar.rahulpihujetpackdemo.ui.components.customNavigationBar.CustomBottomNavigationBar
 import com.interstellar.rahulpihujetpackdemo.ui.components.customNavigationBar.model.BottomNavItem
-import com.interstellar.rahulpihujetpackdemo.ui.screen.cart.CartDetailScreen
 import com.interstellar.rahulpihujetpackdemo.ui.screen.home.HomeScreen
 import com.interstellar.rahulpihujetpackdemo.ui.screen.module.CartScreen
 import com.interstellar.rahulpihujetpackdemo.ui.screen.module.ProfileScreen
@@ -30,13 +29,13 @@ import com.interstellar.rahulpihujetpackdemo.ui.screen.module.WishListScreen
 import kotlin.system.exitProcess
 
 
-import android.content.ContextWrapper
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 
 
 @Composable
-fun MainHomeScreen(
+fun MainScreen(
     globalActions: GlobalNavigationActions,
     authManager: AppDataManager
 ) {
@@ -48,52 +47,39 @@ fun MainHomeScreen(
 
     // ✅ SMART BackHandler - Only intercept when necessary
     val currentDestination by bottomNavController.currentBackStackEntryAsState()
-    val currentRoute = currentDestination?.destination?.route
+    //val currentRoute = currentDestination?.destination?.route
 
 
     // ✅ Auto-sync selectedIndex with current route
-    LaunchedEffect(currentRoute) {
-        selectedIndex = when (currentRoute) {
-
-
-            "Dest.Home" -> 0
-            "Dest.WishList" -> 1
-            "Dest.Cart" -> 2
-            "Dest.Profile" -> 3
-            else -> selectedIndex
+    //// ✅ ONLY this LaunchedEffect controls selectedIndex
+    LaunchedEffect(currentDestination) {
+        currentDestination?.let { entry ->
+            val route = entry.destination.route
+            selectedIndex = when {
+                route?.contains("Dest.Home") == true -> 0
+                route?.contains("Dest.WishList") == true -> 1
+                route?.contains("Dest.Cart") == true -> 2
+                route?.contains("Dest.Profile") == true -> 3
+                else -> selectedIndex // Keep current if unknown route
+            }
         }
     }
 
+
+    // ✅ IMPROVED: Smart back handling with proper tab indicator sync
     BackHandler(enabled = true) {
-        when (currentRoute) {
-            "Dest.Home" -> {
+        when {
+            selectedIndex == 0 -> {
+                // On Home tab - show exit dialog
                 showExitDialog = true
-            }           // Exit confirmation
-            "Dest.WishList", "Dest.Cart", "Dest.Profile" -> {
-                // ✅ Other tabs - Navigate to Home tab and update UI
-                // ✅ Navigate first
-                // ✅ Update UI indicator after navigation
-
-                bottomNavController.navigate("Dest.Home") {
-                    popUpTo(bottomNavController.graph.findStartDestination().id) {
-                        saveState = true
-                    }
-                    launchSingleTop = true
-                    restoreState = true
-                }
-                selectedIndex = 0 // ✅ Update immediately after navigation
-
             }
-
             else -> {
-                // ✅ Other screens - Normal back navigation
-                if (!bottomNavController.popBackStack()) {
-                    showExitDialog = true
-                }
+                // On other tabs - navigate to Home and update indicator
+                navigateToHome(bottomNavController)
+                // selectedIndex will be updated automatically by LaunchedEffect
             }
         }
     }
-
     if (showExitDialog) {
         ExitConfirmationDialog(
             onConfirm = {
@@ -140,13 +126,10 @@ fun MainHomeScreen(
                 items = navItems,
                 selectedIndex = selectedIndex,
                 onItemSelected = { index ->
-                    selectedIndex = index
-                    bottomNavController.navigate(navItems[index].destination) {
-                        popUpTo(Dest.Home) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
+                    // ✅ FIXED: Only navigate if different tab selected
+                    if (index != selectedIndex) {
+                        navigateToTab(bottomNavController, index, navItems)
+                        // selectedIndex will be updated automatically by LaunchedEffect
                     }
                 },
                 modifier = Modifier.windowInsetsPadding(WindowInsets.navigationBars)
@@ -196,6 +179,36 @@ fun MainHomeScreen(
     }
 }
 
+// ✅ Helper function for navigating to home
+private fun navigateToHome(navController: NavHostController) {
+    navController.navigate(Dest.Home) {
+        popUpTo(navController.graph.findStartDestination().id) {
+            saveState = true
+        }
+        launchSingleTop = true
+        restoreState = true
+    }
+}
+
+// ✅ Helper function for tab navigation
+private fun navigateToTab(
+    navController: NavHostController,
+    index: Int,
+    navItems: List<BottomNavItem>
+) {
+    val destination = navItems[index].destination
+
+    navController.navigate(destination) {
+        // Pop up to the start destination to avoid building up a large stack
+        popUpTo(navController.graph.findStartDestination().id) {
+            saveState = true
+        }
+        // Avoid multiple copies of the same destination
+        launchSingleTop = true
+        // Restore state when reselecting a previously selected item
+        restoreState = true
+    }
+}
 // ✅ EXIT CONFIRMATION DIALOG
 @Composable
 fun ExitConfirmationDialog(
