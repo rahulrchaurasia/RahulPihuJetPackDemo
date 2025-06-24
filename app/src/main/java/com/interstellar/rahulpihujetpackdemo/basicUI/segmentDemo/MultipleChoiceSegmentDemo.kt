@@ -11,7 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.shape.RoundedCornerShape
-import com.interstellar.rahulpihujetpackdemo.ui.components.MultipleChoiceSegment
+import com.interstellar.rahulpihujetpackdemo.presentation.components.MultipleChoiceSegment
 
 @Composable
 fun MultipleChoiceSegmentDemo() {

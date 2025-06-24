@@ -12,8 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.interstellar.rahulpihujetpackdemo.R
-import com.interstellar.rahulpihujetpackdemo.ui.components.ImageDialog
-import com.interstellar.rahulpihujetpackdemo.ui.theme.RahulPihuJetPackDemoTheme
+import com.interstellar.rahulpihujetpackdemo.presentation.components.ImageDialog
+import com.interstellar.rahulpihujetpackdemo.presentation.theme.RahulPihuJetPackDemoTheme
 
 @Composable
 fun ImageDialogDemo() {

@@ -19,7 +19,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.interstellar.rahulpihujetpackdemo.R
-import com.interstellar.rahulpihujetpackdemo.ui.theme.RahulPihuJetPackDemoTheme
+import com.interstellar.rahulpihujetpackdemo.presentation.theme.RahulPihuJetPackDemoTheme
 
 
 @Composable

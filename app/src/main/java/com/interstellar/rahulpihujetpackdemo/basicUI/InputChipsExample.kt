@@ -38,7 +38,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.interstellar.rahulpihujetpackdemo.ui.theme.RahulPihuJetPackDemoTheme
+import com.interstellar.rahulpihujetpackdemo.presentation.theme.RahulPihuJetPackDemoTheme
 
 import androidx.compose.runtime.*
 import androidx.compose.runtime.mutableStateOf

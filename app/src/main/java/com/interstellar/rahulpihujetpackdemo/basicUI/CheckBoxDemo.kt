@@ -19,9 +19,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier  // ✅ Required for padding, fillMaxSize, etc.
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.interstellar.rahulpihujetpackdemo.ui.components.LabeledCheckbox
+import com.interstellar.rahulpihujetpackdemo.presentation.components.LabeledCheckbox
 
-import com.interstellar.rahulpihujetpackdemo.ui.theme.RahulPihuJetPackDemoTheme
+import com.interstellar.rahulpihujetpackdemo.presentation.theme.RahulPihuJetPackDemoTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)

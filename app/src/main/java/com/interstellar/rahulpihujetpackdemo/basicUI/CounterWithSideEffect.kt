@@ -23,7 +23,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource.Companion.SideE
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.provider.FontsContractCompat.Columns
-import com.interstellar.rahulpihujetpackdemo.ui.theme.RahulPihuJetPackDemoTheme
+import com.interstellar.rahulpihujetpackdemo.presentation.theme.RahulPihuJetPackDemoTheme
 
 @Composable
 fun CounterWithoutSideEffect(){

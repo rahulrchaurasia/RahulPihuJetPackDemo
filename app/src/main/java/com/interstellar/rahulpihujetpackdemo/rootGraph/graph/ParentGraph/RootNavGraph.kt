@@ -10,7 +10,7 @@ import com.interstellar.rahulpihujetpackdemo.rootGraph.graph.ChildGraph.authNavi
 import com.interstellar.rahulpihujetpackdemo.rootGraph.graph.ChildGraph.mainNavigation
 import com.interstellar.rahulpihujetpackdemo.rootGraph.navigation.AppDataManager
 
-import com.interstellar.rahulpihujetpackdemo.ui.screen.SplashScreen
+import com.interstellar.rahulpihujetpackdemo.presentation.screen.SplashScreen
 /*
 
 Current Navigation Architecture
@@ -26,6 +26,8 @@ kotlinMainApp -> Manual tab switching with selectedIndex
 ├── Cart
 └── Profile
  */
+
+//Note :RootNavGraph take decison  based on login state where ti navigate to Auth or Main graph
 @Composable
 fun RootNavGraph(
     navController: NavHostController,
@@ -39,6 +41,7 @@ fun RootNavGraph(
     NavHost(
         navController = navController,
         startDestination = Dest.Splash,
+
         popEnterTransition = { NavigationAnimations.slideInLeft },
         popExitTransition = { NavigationAnimations.slideOutRight }
     ) {

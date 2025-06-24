@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.tooling.preview.Preview
-import com.interstellar.rahulpihujetpackdemo.ui.components.CustomCircleCheckbox
+import com.interstellar.rahulpihujetpackdemo.presentation.components.CustomCircleCheckbox
 
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import com.interstellar.rahulpihujetpackdemo.domain.model.ValidationResult
-import com.interstellar.rahulpihujetpackdemo.ui.components.AutoCompleteDropdown
+import com.interstellar.rahulpihujetpackdemo.presentation.components.AutoCompleteDropdown
 
 @Composable
 fun DemoAutoComplete() {

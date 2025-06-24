@@ -23,8 +23,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.toSize
 import com.interstellar.rahulpihujetpackdemo.domain.model.Animal
-import com.interstellar.rahulpihujetpackdemo.ui.components.AnimalSearchBar
-import com.interstellar.rahulpihujetpackdemo.ui.components.CustomSearchBar
+import com.interstellar.rahulpihujetpackdemo.presentation.components.AnimalSearchBar
+import com.interstellar.rahulpihujetpackdemo.presentation.components.CustomSearchBar
 
 
 @Composable

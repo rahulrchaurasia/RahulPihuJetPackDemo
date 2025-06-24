@@ -1,8 +1,10 @@
 package com.interstellar.rahulpihujetpackdemo.rootGraph.graph
 
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
+import com.interstellar.rahulpihujetpackdemo.rootGraph.anim.NavigationAnimations
 
-class GlobalNavigationActions(private val navController: NavHostController) {
+//Note: designed to abstract and centralize navigation logic
+class GlobalNavigationActions(private val navController: NavController) {
     
     // Auth Navigation
     fun navigateToWelcome() {
@@ -41,7 +43,10 @@ class GlobalNavigationActions(private val navController: NavHostController) {
         // ✅ NEW: Direct navigation to cart
         navController.navigate(Dest.CartDetail("", "", ""))
     }
+
+
     // Generic Navigation
+    // ✅ PERFECT: Generic navigation method handles everything
     fun navigateTo(destination: Dest) {
         navController.navigate(destination)
     }
@@ -53,4 +58,7 @@ class GlobalNavigationActions(private val navController: NavHostController) {
     fun popBackToRoute(destination: Dest, inclusive: Boolean = false) {
         navController.popBackStack(destination, inclusive)
     }
+
+
+
 }

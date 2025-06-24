@@ -1,8 +1,6 @@
 package com.interstellar.rahulpihujetpackdemo.rootGraph.navigation
 
 
-import androidx.datastore.preferences.preferencesDataStore
-
 // 4. Authentication State Manager
 
 
@@ -15,7 +13,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.interstellar.rahulpihujetpackdemo.data.local.model.CartItem
+import com.interstellar.rahulpihujetpackdemo.data.local.model.cart.CartItem
 import com.interstellar.rahulpihujetpackdemo.data.local.model.Product
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow

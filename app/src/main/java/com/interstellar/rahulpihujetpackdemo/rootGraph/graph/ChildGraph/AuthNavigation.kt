@@ -6,9 +6,9 @@ import com.interstellar.rahulpihujetpackdemo.rootGraph.anim.NavigationAnimations
 import com.interstellar.rahulpihujetpackdemo.rootGraph.graph.Dest
 import com.interstellar.rahulpihujetpackdemo.rootGraph.graph.GlobalNavigationActions
 import com.interstellar.rahulpihujetpackdemo.rootGraph.navigation.AppDataManager
-import com.interstellar.rahulpihujetpackdemo.ui.screen.LoginScreen
+import com.interstellar.rahulpihujetpackdemo.presentation.screen.LoginScreen
 
-import com.interstellar.rahulpihujetpackdemo.ui.screen.WelcomeScreen
+import com.interstellar.rahulpihujetpackdemo.presentation.screen.WelcomeScreen
 
 /*
 Current Navigation Architecture

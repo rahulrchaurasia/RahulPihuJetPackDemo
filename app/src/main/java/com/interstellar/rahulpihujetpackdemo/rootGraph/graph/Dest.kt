@@ -50,4 +50,13 @@ sealed class Dest {
         val productName: String,
         val productPrice: String
     ) : Dest()
+
+    @Serializable
+    data object Receipt : Dest()
+
+    @Serializable
+    data object CarInsurance : Dest()
+
+    @Serializable
+    data object CarJourney : Dest()
 }

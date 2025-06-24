@@ -20,18 +20,21 @@ import com.interstellar.rahulpihujetpackdemo.rootGraph.graph.GlobalNavigationAct
 import com.interstellar.rahulpihujetpackdemo.rootGraph.graph.LocalNavController
 import com.interstellar.rahulpihujetpackdemo.rootGraph.navigation.AppDataManager
 
-import com.interstellar.rahulpihujetpackdemo.ui.components.customNavigationBar.CustomBottomNavigationBar
-import com.interstellar.rahulpihujetpackdemo.ui.components.customNavigationBar.model.BottomNavItem
-import com.interstellar.rahulpihujetpackdemo.ui.screen.home.HomeScreen
-import com.interstellar.rahulpihujetpackdemo.ui.screen.module.CartScreen
-import com.interstellar.rahulpihujetpackdemo.ui.screen.module.ProfileScreen
-import com.interstellar.rahulpihujetpackdemo.ui.screen.module.WishListScreen
+import com.interstellar.rahulpihujetpackdemo.presentation.components.customNavigationBar.CustomBottomNavigationBar
+import com.interstellar.rahulpihujetpackdemo.presentation.components.customNavigationBar.model.BottomNavItem
+import com.interstellar.rahulpihujetpackdemo.presentation.screen.home.HomeScreen
+import com.interstellar.rahulpihujetpackdemo.presentation.screen.module.CartScreen
+import com.interstellar.rahulpihujetpackdemo.presentation.screen.module.ProfileScreen
+import com.interstellar.rahulpihujetpackdemo.presentation.screen.module.WishListScreen
 import kotlin.system.exitProcess
 
 
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.interstellar.rahulpihujetpackdemo.presentation.screen.carInsurance.CarInsuranceScreen
+import com.interstellar.rahulpihujetpackdemo.presentation.screen.transaction.TransactionScreen
+import com.interstellar.rahulpihujetpackdemo.rootGraph.anim.NavigationAnimations
 
 
 @Composable
@@ -156,15 +159,36 @@ fun MainScreen(
             }
 
             // WishList Tab
+        //    composable<Dest.WishList> {
+//                WishListScreen()
+//            }
             composable<Dest.WishList> {
-                WishListScreen()
+                CarInsuranceScreen(
+                    globalActions = globalActions,
+                    handleSystemBars = false,
+                    onNavigateToCarJourney = {
+                        globalActions.navigateTo(Dest.CarJourney)  // Goes to mainNavigation
+                    }
+                )
             }
 
             // Cart Tab
             // ✅ FIXED: Cart Tab - Use CartDetailScreen with correct parameters
             composable<Dest.Cart> {
-                CartScreen()
+                //CartScreen()
+
+                TransactionScreen(
+                   // navController = bottomNavController, // ✅ Added required navController
+                    globalActions = globalActions,
+                    modifier = Modifier.fillMaxSize() ,   // ✅ Fixed typo: "modifire" -> "modifier"
+                    onNavigateToCarInsurance = {
+
+                        globalActions.navigateTo(Dest.CarInsurance)
+                    }
+                )
             }
+
+
 
             // Profile Tab
             composable<Dest.Profile> {

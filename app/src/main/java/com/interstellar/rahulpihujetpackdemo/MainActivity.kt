@@ -16,7 +16,7 @@ import androidx.navigation.compose.rememberNavController
 import com.interstellar.rahulpihujetpackdemo.rootGraph.graph.ParentGraph.RootNavGraph
 import com.interstellar.rahulpihujetpackdemo.rootGraph.navigation.AppDataManager
 import com.interstellar.rahulpihujetpackdemo.rootGraph.navigation.LocalNavController
-import com.interstellar.rahulpihujetpackdemo.ui.theme.RahulPihuJetPackDemoTheme
+import com.interstellar.rahulpihujetpackdemo.presentation.theme.RahulPihuJetPackDemoTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

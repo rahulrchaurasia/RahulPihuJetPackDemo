@@ -88,6 +88,20 @@ dependencies {
     kaptTest(libs.hilt.compiler)
 
 
+    // 🔄 ViewModel & Lifecycle
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+
+    // 🌐 Networking (Retrofit & OkHttp)
+    implementation(libs.retrofit)
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
+
+    // 📝 Kotlinx Serialization
+    implementation(libs.kotlinx.serialization.json.v173)
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
+
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

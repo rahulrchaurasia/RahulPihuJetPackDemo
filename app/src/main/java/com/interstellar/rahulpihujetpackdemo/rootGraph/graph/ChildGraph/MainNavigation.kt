@@ -1,5 +1,7 @@
 package com.interstellar.rahulpihujetpackdemo.rootGraph.graph.ChildGraph
 
+import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
@@ -9,9 +11,13 @@ import com.interstellar.rahulpihujetpackdemo.rootGraph.graph.GlobalNavigationAct
 import com.interstellar.rahulpihujetpackdemo.rootGraph.navigation.AppDataManager
 
 import com.interstellar.rahulpihujetpackdemo.MainScreen
-import com.interstellar.rahulpihujetpackdemo.ui.screen.cart.CartDetailScreen
-import com.interstellar.rahulpihujetpackdemo.ui.screen.product.ProductDetailScreen
-import com.interstellar.rahulpihujetpackdemo.ui.screen.product.ProductsScreen
+import com.interstellar.rahulpihujetpackdemo.presentation.screen.carInsurance.CarInsuranceScreen
+import com.interstellar.rahulpihujetpackdemo.presentation.screen.carInsurance.CarJourneyScreen
+import com.interstellar.rahulpihujetpackdemo.presentation.screen.cart.CartDetailScreen
+import com.interstellar.rahulpihujetpackdemo.presentation.screen.product.ProductDetailScreen
+import com.interstellar.rahulpihujetpackdemo.presentation.screen.product.ProductsScreen
+import com.interstellar.rahulpihujetpackdemo.presentation.screen.receipt.ReceiptScreen
+
 /*
    ***************************************************
     Current Navigation Architecture
@@ -29,6 +35,11 @@ import com.interstellar.rahulpihujetpackdemo.ui.screen.product.ProductsScreen
     ***************************************************
  */
 
+//2️⃣ MAIN APP MODULE
+//this for main App Module
+//Note: we diveded graph in 3 module
+
+// NavGraph is the actual map that says where each screen lives:
 fun NavGraphBuilder.mainNavigation(
     globalActions: GlobalNavigationActions,
     appDataManager: AppDataManager
@@ -61,7 +72,7 @@ fun NavGraphBuilder.mainNavigation(
         )
     }
 
-    // ✅ ADD THIS - ProductDetail Screen (This was missing!)
+    // ✅ ProductDetail Screen to Cart Screen
     composable<Dest.ProductDetail>(
         enterTransition = { NavigationAnimations.slideInRight },
         exitTransition = { NavigationAnimations.slideOutLeft }
@@ -83,6 +94,9 @@ fun NavGraphBuilder.mainNavigation(
         )
     }
 
+
+
+
     // ✅ ADD THIS - CartDetail Screen (Also add this if you use navigateToCartDetail)
     composable<Dest.CartDetail>(
         enterTransition = { NavigationAnimations.slideInRight },
@@ -91,9 +105,7 @@ fun NavGraphBuilder.mainNavigation(
         val cartDetail = backStackEntry.toRoute<Dest.CartDetail>()
 
         CartDetailScreen(
-//            productId = cartDetail.productId,
-//            productName = cartDetail.productName,
-//            productPrice = cartDetail.productPrice,
+
             onGoHome = {
                 globalActions.navigateTo(Dest.MainHome)
             },
@@ -108,8 +120,55 @@ fun NavGraphBuilder.mainNavigation(
                 // ✅ Navigate back to product detail to add more quantity
                 globalActions.navigateToProductDetail(productId)
             },
+            onNavigateToRecieptScreen = {
+                // ✅ Navigate to Receipt Screen
+                globalActions.navigateTo(Dest.Receipt)
+            },
             appDataManager = appDataManager
         )
     }
 
+    //✅ Receipt Screen
+    composable<Dest.Receipt>(
+        enterTransition = { NavigationAnimations.slideInRight },
+        exitTransition = { NavigationAnimations.slideOutLeft }
+    ) {
+
+        ReceiptScreen(
+            globalActions = globalActions
+//            viewModel = hiltViewModel(),
+//            modifier = Modifier
+         )
+        }
+
+
+ //✅ ADD THIS - Car Insurance  Screen (Also add this if you use navigateToCartDetail)
+    composable<Dest.CarInsurance>(
+        enterTransition = { NavigationAnimations.slideInRight },
+        exitTransition = { NavigationAnimations.slideOutLeft }
+    ) {
+        CarInsuranceScreen(
+            globalActions = globalActions,
+            handleSystemBars = true,
+            onNavigateToCarJourney = {
+                globalActions.navigateTo(Dest.CarJourney)  //// 🔁 this will use the transition above
+            }
+
+        )
+    }
+
+
+
+    // ✅ CarJourney (outside bottom navigation)
+    composable<Dest.CarJourney>(
+        enterTransition = { NavigationAnimations.slideInRight },
+        exitTransition = { NavigationAnimations.slideOutLeft }
+    ) {
+        CarJourneyScreen(
+            globalActions = globalActions,
+            onBackPressed = {
+                globalActions.navigateBack()
+            }
+        )
+    }
 }
