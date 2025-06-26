@@ -22,8 +22,17 @@ class ReceiptViewModel @Inject constructor(
     val cartTotal = appDataManager.cartTotal
     val cartCount = appDataManager.cartCount
 
+    var transactionId: String? = null // ✅ store it
+
+//    fun setTransactionId(id: String) {
+//        transactionId = id
+//        println("🧾 Transaction ID: $id") // ✅ log for debug
+//    }
+
+
     // Receipt-specific logic
     fun generateReceiptData(): ReceiptData {
+
         return ReceiptData(
             items = cartItems.value,
             subtotal = cartTotal.value,
@@ -38,20 +47,13 @@ class ReceiptViewModel @Inject constructor(
         )
     }
 
-    // Receipt-specific operations
-    fun shareReceipt(context: Context, receiptData: ReceiptData) {
-        val receiptText = ReceiptUtils.buildReceiptText(receiptData)
 
-        val shareIntent = Intent().apply {
-            action = Intent.ACTION_SEND
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, receiptText)
-            putExtra(Intent.EXTRA_SUBJECT, "Receipt - ${receiptData.receiptNumber}")
-        }
 
-        context.startActivity(
-            Intent.createChooser(shareIntent, "Share Receipt")
-        )
+
+    fun clearCart() {
+        appDataManager.clearCart()  // or reset cartItems, cartTotal, cartCount
+
     }
+
 
 }

@@ -40,7 +40,7 @@ import com.interstellar.rahulpihujetpackdemo.rootGraph.anim.NavigationAnimations
 @Composable
 fun MainScreen(
     globalActions: GlobalNavigationActions,
-    authManager: AppDataManager
+   // authManager: AppDataManager
 ) {
     val bottomNavController = LocalNavController()
     var selectedIndex by remember { mutableIntStateOf(0) }
@@ -154,6 +154,9 @@ fun MainScreen(
                 HomeScreen(
                     onNavigateToProducts = {
                         globalActions.navigateToProducts()
+                    },
+                    onNavigateToCart = {
+                        globalActions.navigateToCart()
                     }
                 )
             }
@@ -194,8 +197,8 @@ fun MainScreen(
             composable<Dest.Profile> {
                 ProfileScreen(
                     onLogout = {
-                        authManager.logout()
-                        globalActions.navigateToWelcome()
+                       // authManager.logout()
+                        globalActions.navigateToLogin()
                     }
                 )
             }

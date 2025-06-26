@@ -1,4 +1,4 @@
-package com.interstellar.rahulpihujetpackdemo.data.local.model.exception
+package com.interstellar.rahulpihujetpackdemo.data.remote.exception
 
 class ApiException(
     message: String,

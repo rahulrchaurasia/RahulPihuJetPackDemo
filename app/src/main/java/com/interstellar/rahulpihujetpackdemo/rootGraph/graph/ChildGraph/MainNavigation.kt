@@ -51,8 +51,7 @@ fun NavGraphBuilder.mainNavigation(
         exitTransition = { NavigationAnimations.slideOutLeft }
     ) {
         MainScreen(
-            globalActions = globalActions,
-            authManager = appDataManager
+            globalActions = globalActions
         )
     }
 
@@ -83,9 +82,10 @@ fun NavGraphBuilder.mainNavigation(
             productId = productDetail.productId,
 
             onBackPressed = {
-                globalActions.navigateBack()
+               // globalActions.navigateBack()
+                globalActions.popBackToRoute(Dest.Products,inclusive = false)
             },
-            appDataManager = appDataManager,// ✅ Pass appDataManager
+
             onNavigateToCart = {
                 // ✅ Direct navigation to cart
                 globalActions.navigateToCart()
@@ -107,10 +107,13 @@ fun NavGraphBuilder.mainNavigation(
         CartDetailScreen(
 
             onGoHome = {
-                globalActions.navigateTo(Dest.MainHome)
+                globalActions.popBackToRoute(Dest.MainHome,inclusive = false)
+              //  globalActions.popBackToRoute(Dest.Products)
             },
             onBackToProducts = {
-                globalActions.popBackToRoute(Dest.Products)
+                globalActions.safePopBackToRoute(
+                    destination = Dest.Products,
+                    fallback = {globalActions.navigateBack()})
             },
             onShareProduct = { shareText ->
                 // Implement share functionality
@@ -120,11 +123,12 @@ fun NavGraphBuilder.mainNavigation(
                 // ✅ Navigate back to product detail to add more quantity
                 globalActions.navigateToProductDetail(productId)
             },
-            onNavigateToRecieptScreen = {
+            onNavigateToRecieptScreen = { transactionId ->
                 // ✅ Navigate to Receipt Screen
-                globalActions.navigateTo(Dest.Receipt)
-            },
-            appDataManager = appDataManager
+                globalActions.navigateTo(Dest.Receipt(transactionId))
+
+                //Note : we can direct used globalActions or maintain  navigateToProductDetail which is same
+            }
         )
     }
 
@@ -135,6 +139,7 @@ fun NavGraphBuilder.mainNavigation(
     ) {
 
         ReceiptScreen(
+            transactionId = String(),
             globalActions = globalActions
 //            viewModel = hiltViewModel(),
 //            modifier = Modifier

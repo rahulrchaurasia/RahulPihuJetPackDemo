@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.interstellar.rahulpihujetpackdemo.rootGraph.navigation.AppDataManager
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,9 +24,14 @@ import androidx.compose.foundation.lazy.items
 
 
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 
 import com.interstellar.rahulpihujetpackdemo.data.local.model.cart.CartItem
 import com.interstellar.rahulpihujetpackdemo.presentation.components.dialog.CommonAlertDialog
+import com.interstellar.rahulpihujetpackdemo.presentation.screen.payment.PaymentBottomDialog
+import com.interstellar.rahulpihujetpackdemo.presentation.screen.payment.PaymentBottomDialog1
+import com.interstellar.rahulpihujetpackdemo.presentation.theme.AppColors
+import com.interstellar.rahulpihujetpackdemo.presentation.viewmodel.ProductDetailViewModel
 
 // 3. NEW CartDetailScreen
 
@@ -38,12 +42,13 @@ fun CartDetailScreen(
     onBackToProducts: () -> Unit,
     onShareProduct: (String) -> Unit,
     onNavigateToProductDetail: (String) -> Unit,
-    onNavigateToRecieptScreen: () -> Unit,
-    appDataManager: AppDataManager
+    onNavigateToRecieptScreen: (String) -> Unit,
+    viewModel : ProductDetailViewModel = hiltViewModel(),
+    //appDataManager: AppDataManager
 ) {
     // Get all cart items with proper state collection
-    val cartItems by appDataManager.cartItems.collectAsState()
-    val cartTotal by appDataManager.cartTotal.collectAsState()
+    val cartItems by viewModel.cartItems.collectAsState()
+    val cartTotal by viewModel.cartTotal.collectAsState()
 
     // Calculate proper counts
     val totalUniqueItems = cartItems.size // Number of different products
@@ -53,6 +58,8 @@ fun CartDetailScreen(
     var showDeleteDialog by remember { mutableStateOf(false) }
     var itemToDelete by remember { mutableStateOf<CartItem?>(null) }
     var showClearCartDialog by remember { mutableStateOf(false) }
+
+    var showPaymentDialog by remember { mutableStateOf(false) }
 
     // ✅ CORRECT: Using onBackToProducts for back button
     BackHandler(enabled = true) {
@@ -129,9 +136,9 @@ fun CartDetailScreen(
                         .fillMaxWidth()
                         .padding(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                        containerColor = AppColors.cardGray
                     ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 10.dp)
                 ) {
                     Row(
                         modifier = Modifier
@@ -198,7 +205,7 @@ fun CartDetailScreen(
                                     itemToDelete = cartItem
                                     showDeleteDialog = true
                                 } else {
-                                    appDataManager.updateCartItemQuantity(cartItem.id, newQuantity)
+                                    viewModel.updateCartItemQuantity(cartItem.id, newQuantity)
                                 }
                             }
                         )
@@ -213,7 +220,10 @@ fun CartDetailScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Button(
-                        onClick = { onNavigateToRecieptScreen() },
+                        onClick = {
+                                   // onNavigateToRecieptScreen()
+                                    showPaymentDialog = true
+                                  },
                         modifier = Modifier.fillMaxWidth().height(48.dp)
                     ) {
                         Icon(Icons.Default.Payment, contentDescription = null)
@@ -240,7 +250,7 @@ fun CartDetailScreen(
             confirmButtonText = "Remove",
             cancelButtonText = "Cancel",
             onConfirm = {
-                itemToDelete?.let { appDataManager.removeFromCart(it.id) }
+                itemToDelete?.let { viewModel.removeFromCart(it.id) }
                 showDeleteDialog = false
                 itemToDelete = null
             },
@@ -258,10 +268,23 @@ fun CartDetailScreen(
             confirmButtonText = "Clear All",
             cancelButtonText = "Cancel",
             onConfirm = {
-                appDataManager.clearCart()
+                viewModel.clearCart()
                 showClearCartDialog = false
             },
             icon = Icons.Default.DeleteSweep
+        )
+    }
+
+    if (showPaymentDialog) {
+        PaymentBottomDialog(
+            onDismiss = { showPaymentDialog = false },
+            onPaymentSuccess = { transactionId ->
+                showPaymentDialog = false
+
+                onNavigateToRecieptScreen(transactionId)
+                // Navigate to receipt screen or show success message
+                // You can use the transactionId for receipt display
+            }
         )
     }
 }
@@ -305,7 +328,7 @@ fun CartDetailScreenWithItemsPreview() {
                         .fillMaxWidth()
                         .padding(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                        containerColor = AppColors.cardGray
                     )
                 ) {
                     Row(

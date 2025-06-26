@@ -1,19 +1,19 @@
-package com.interstellar.rahulpihujetpackdemo.data.local.model.response
+package com.interstellar.rahulpihujetpackdemo.data.remote.response.register
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LoginResponse(
+data class RegisterResponse(
+    @SerialName("MasterData")
+    val masterData: RegisterData,
+
     @SerialName("Message")
     val message: String,
-    
+
     @SerialName("Status")
     val status: String,
-    
+
     @SerialName("StatusNo")
-    val statusNo: Int,
-    
-    @SerialName("MasterData")
-    val masterData: MasterData?
+    val statusNo: Int
 )

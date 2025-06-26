@@ -18,6 +18,10 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -34,13 +38,16 @@ import com.interstellar.rahulpihujetpackdemo.presentation.util.ReceiptUtils.shar
 
 import com.interstellar.rahulpihujetpackdemo.presentation.viewmodel.ReceiptViewModel
 import com.interstellar.rahulpihujetpackdemo.rootGraph.graph.GlobalNavigationActions
-
+import com.interstellar.rahulpihujetpackdemo.rootGraph.navigation.AppDataManager
 
 
 @Composable
 fun ReceiptScreen(
+
+    transactionId : String,
     globalActions: GlobalNavigationActions,
     viewModel: ReceiptViewModel = hiltViewModel(), // ✅ Now this is correct
+
     modifier: Modifier = Modifier
 ) {
     val cartItems by viewModel.cartItems.collectAsState()
@@ -48,13 +55,36 @@ fun ReceiptScreen(
     val cartCount by viewModel.cartCount.collectAsState()
 
     val context = LocalContext.current
-    val scrollState = rememberScrollState() // ✅ this is requi
+    val scrollState = rememberScrollState() // ✅ this is required
+
+    // ✅ Local state to snapshot receipt once
+    val  receiptData = remember { mutableStateOf<ReceiptData?>(null) }
 
     // Receipt data
-    val receiptData = remember(cartItems, cartTotal, cartCount) {
+//    val receiptData = remember(cartItems, cartTotal, cartCount) {
+//
+//        viewModel.generateReceiptData()
+//    }
 
-        viewModel.generateReceiptData()
+    // ✅ Only fetch + clear cart ONCE when screen loads
+
+    LaunchedEffect(transactionId) {
+       // viewModel.setTransactionId(transactionId) // ✅ log and store it
+        viewModel.transactionId = transactionId
     }
+    LaunchedEffect(Unit) {
+
+        if(receiptData.value == null){
+
+            // Snapshot current cart
+            val receipt = viewModel.generateReceiptData()
+            receiptData.value = receipt
+            // Then clear the cart so UI state is frozen
+            viewModel.clearCart()  // ✅ clear after snapshot
+           // appDataManager.clearCart()
+        }
+    }
+
 
     BackHandler(enabled = true){
         globalActions.navigateToHome()
@@ -69,22 +99,26 @@ fun ReceiptScreen(
         floatingActionButton = {
             ShareReceiptFAB(
                 onClick = {
-                    shareReceipt(context, receiptData)
+                    receiptData.value?.let {
+                        shareReceipt(context, it)
+                    }
                 }
             )
         },
         floatingActionButtonPosition = FabPosition.End
     ) { paddingValues ->
-        if (cartItems.isEmpty()) {
-            EmptyReceiptContent(
+        receiptData.value?.let { receiptData ->
+            // ✅ Show receipt if snapshot exists
+            ReceiptContent(
+                receiptData = receiptData,
+                scrollState = scrollState,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
             )
-        } else {
-            ReceiptContent(
-                receiptData = receiptData,
-                scrollState = scrollState,
+        } ?: run {
+            // ✅ Show fallback/empty UI if no data is available (rare case)
+            EmptyReceiptContent(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
@@ -96,7 +130,7 @@ fun ReceiptScreen(
 
 }
 
-// ✅ TOP BAR COMPONENT
+
 
 
 
@@ -145,10 +179,13 @@ fun PreviewReceiptScreen() {
         // Mock navigation for preview
 
         ReceiptScreen(
+            transactionId = "RCp909u9",
             globalActions = GlobalNavigationActions(
                 navController = NavController(LocalContext.current)
             ) ,
             viewModel = hiltViewModel(),
-            modifier = Modifier)
+            modifier = Modifier,
+
+        )
     }
 }

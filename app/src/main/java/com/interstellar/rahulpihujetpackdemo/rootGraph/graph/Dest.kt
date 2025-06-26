@@ -52,7 +52,11 @@ sealed class Dest {
     ) : Dest()
 
     @Serializable
-    data object Receipt : Dest()
+    data class Receipt(
+        val transactionId: String
+    ) : Dest()
+
+
 
     @Serializable
     data object CarInsurance : Dest()

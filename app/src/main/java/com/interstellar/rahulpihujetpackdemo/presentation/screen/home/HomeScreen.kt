@@ -19,54 +19,84 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 
+//Note : Used  windowInsets = WindowInsets(0) : Disable insets
 
+// ✅ SIMPLE child screens - no Scaffold, no safe area handling
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-
 fun HomeScreen(
-    onNavigateToProducts: () -> Unit = {}
+    onNavigateToProducts: () -> Unit = {},
+    onNavigateToCart: () -> Unit = {}
 ) {
+    // ✅ Simple Column - parent Scaffold handles safe areas
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Bottom,
         modifier = Modifier.fillMaxSize()
     ) {
-        Text(
-            text = "🏠 Home Screen",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-        Text(
-            text = "Welcome to your home dashboard",
-            fontSize = 16.sp,
-            color = Color.Gray,
-            modifier = Modifier.padding(top = 8.dp)
+        // ✅ TopAppBar with disabled window insets
+        TopAppBar(
+            title = { Text("Home") },
+            actions = {
+                IconButton(onClick = onNavigateToCart) {
+                    Icon(Icons.Default.ShoppingCart, contentDescription = "Cart")
+                }
+            },
+            windowInsets = WindowInsets(0) //05 VVIMP  // ✅ CRITICAL: Disable insets
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = onNavigateToProducts,
-            modifier = Modifier.padding(16.dp)
+        // ✅ Content area
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
-            Text("Browse Products")
+            Text(
+                text = "🏠 Home Screen",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+
+            Text(
+                text = "Welcome to your home dashboard",
+                fontSize = 16.sp,
+                color = Color.Gray,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = onNavigateToProducts,
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text("Browse Products")
+            }
         }
     }
 }
-
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun HomeContentPreview() {
     MaterialTheme {
-        HomeScreen()
+        HomeScreen(
+            onNavigateToProducts = {},
+          //  onNavigateToCart = {}
+        )
     }
 }

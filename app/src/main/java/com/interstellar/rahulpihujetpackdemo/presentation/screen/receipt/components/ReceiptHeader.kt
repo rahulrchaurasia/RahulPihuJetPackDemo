@@ -26,14 +26,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 
 
 import com.interstellar.rahulpihujetpackdemo.data.local.model.receipt.ReceiptData
+import com.interstellar.rahulpihujetpackdemo.presentation.viewmodel.ReceiptViewModel
 
 
 // ✅ RECEIPT HEADER
 @Composable
-fun ReceiptHeader(receiptData: ReceiptData) {
+fun ReceiptHeader(receiptData: ReceiptData,
+                  viewModel: ReceiptViewModel = hiltViewModel(),
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -42,6 +46,13 @@ fun ReceiptHeader(receiptData: ReceiptData) {
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = "Transaction ID: ${viewModel.transactionId.orEmpty()}",
+            fontSize = 12.sp,
+            color = Color.Gray,
             textAlign = TextAlign.Center
         )
 

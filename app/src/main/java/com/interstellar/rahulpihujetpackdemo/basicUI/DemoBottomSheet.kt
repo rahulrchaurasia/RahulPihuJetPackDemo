@@ -12,11 +12,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -27,22 +30,32 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.interstellar.rahulpihujetpackdemo.R
 import com.interstellar.rahulpihujetpackdemo.presentation.theme.RahulPihuJetPackDemoTheme
+import com.interstellar.rahulpihujetpackdemo.presentation.util.formatExpiry
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PartialBottomSheet(){
 
+    var expiryRaw by remember { mutableStateOf("") }
     var showBottomSheet by remember {
         mutableStateOf(false)
     }
+    val focusManager = LocalFocusManager.current
+
 
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = false
@@ -56,6 +69,36 @@ fun PartialBottomSheet(){
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
+
+
+        OutlinedTextField(
+            value = TextFieldValue(
+                text = formatExpiry(expiryRaw),
+                selection = TextRange(formatExpiry(expiryRaw).length)
+            ),
+            onValueChange = { input ->
+                val digits = input.text.filter { it.isDigit() }
+
+                // Allow max 4 digits (MMYY)
+                if (digits.length <= 4) {
+                    expiryRaw = digits
+                    //onExpiryDateChange(formatExpiry(digits))
+
+                }
+            },
+            label = { Text("MM/YY") },
+            modifier = Modifier.weight(1f),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { focusManager.moveFocus(FocusDirection.Next) }
+            ),
+            shape = RoundedCornerShape(12.dp),
+            placeholder = { Text("12/25") }
+        )
         Button(onClick = { showBottomSheet = true }) {
             Text(text = "Open Bottom Sheet")
         }
@@ -76,7 +119,10 @@ fun PartialBottomSheet(){
         }
 
     }
+
+
 }
+
 
 @Preview(
     showBackground = true,

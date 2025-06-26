@@ -31,7 +31,7 @@ import com.interstellar.rahulpihujetpackdemo.presentation.viewmodel.ReceiptViewM
 import com.interstellar.rahulpihujetpackdemo.rootGraph.graph.GlobalNavigationActions
 
 
-
+// ✅ TOP BAR COMPONENT
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReceiptTopBar(

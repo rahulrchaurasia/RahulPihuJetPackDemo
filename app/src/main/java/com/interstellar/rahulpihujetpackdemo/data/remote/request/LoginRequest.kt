@@ -1,4 +1,4 @@
-package com.interstellar.rahulpihujetpackdemo.data.local.model.request
+package com.interstellar.rahulpihujetpackdemo.data.remote.request
 
 import kotlinx.serialization.Serializable
 

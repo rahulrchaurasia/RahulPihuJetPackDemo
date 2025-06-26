@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.interstellar.rahulpihujetpackdemo.data.local.model.common.ApiResult
-import com.interstellar.rahulpihujetpackdemo.data.local.model.response.LoginResponse
+import com.interstellar.rahulpihujetpackdemo.data.remote.common.ApiResult
+import com.interstellar.rahulpihujetpackdemo.data.remote.response.login.LoginResponse
 import com.interstellar.rahulpihujetpackdemo.domain.usecase.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay

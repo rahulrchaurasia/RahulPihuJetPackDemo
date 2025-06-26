@@ -11,7 +11,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.interstellar.rahulpihujetpackdemo.presentation.viewmodel.ProfileViewModel
 
 import com.interstellar.rahulpihujetpackdemo.rootGraph.router.HomeRoutes
 
@@ -114,7 +116,10 @@ fun CartScreen() {
 }
 
 @Composable
-fun ProfileScreen(onLogout: () -> Unit) {
+fun ProfileScreen(
+    onLogout: () -> Unit,
+    viewModel: ProfileViewModel = hiltViewModel()
+    ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -152,7 +157,10 @@ fun ProfileScreen(onLogout: () -> Unit) {
         Spacer(modifier = Modifier.weight(1f))
 
         Button(
-            onClick = onLogout,
+            onClick = {
+                        viewModel.logout()
+                        onLogout()
+                      },
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.error

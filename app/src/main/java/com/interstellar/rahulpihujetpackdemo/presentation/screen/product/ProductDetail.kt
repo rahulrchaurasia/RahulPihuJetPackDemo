@@ -106,10 +106,12 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 
 // Preview (optional)
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.interstellar.rahulpihujetpackdemo.data.local.model.Product
 import com.interstellar.rahulpihujetpackdemo.rootGraph.navigation.AppDataManager
 import com.interstellar.rahulpihujetpackdemo.rootGraph.router.HomeRoutes
 import com.interstellar.rahulpihujetpackdemo.presentation.components.dialog.CommonAlertDialog
+import com.interstellar.rahulpihujetpackdemo.presentation.viewmodel.ProductDetailViewModel
 
 // Serialization (for Product data class)
 import kotlinx.serialization.Serializable
@@ -120,14 +122,14 @@ import kotlinx.serialization.Serializable
 fun ProductDetailScreen(
     productId: String,
     onBackPressed: () -> Unit,
-    appDataManager: AppDataManager, // ✅ Add this parameter,
+    viewModel: ProductDetailViewModel = hiltViewModel(),
     onNavigateToCart: () -> Unit = {} // ✅ NEW: Direct cart navigation
 ) {
 
     // ✅ Custom back handling for specific screens
-//    BackHandler(enabled = true) {
-//        onBackPress()
-//    }
+    BackHandler(enabled = true) {
+        onBackPressed()
+    }
     // Mock product data based on ID
     val product = remember(productId) {
         sampleProducts.find { it.id == productId } ?: Product(
@@ -141,7 +143,7 @@ fun ProductDetailScreen(
 
 
     // Cart state
-    val cartItems by appDataManager.cartItems.collectAsState()
+    val cartItems by viewModel.cartItems.collectAsState()
     val existingCartItem = cartItems.find { it.id == productId }
     val isInCart = existingCartItem != null
 
@@ -169,7 +171,7 @@ fun ProductDetailScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         // Show cart item count if items exist
-                        val cartCount by appDataManager.cartCount.collectAsState()
+                        val cartCount by viewModel.cartCount.collectAsState()
                         if (cartCount > 0) {
                             BadgedBox(
                                 badge = {
@@ -517,7 +519,7 @@ fun ProductDetailScreen(
         cancelButtonText = "Cancel",
         onConfirm = {
             // Add to cart using AppDataManager
-            appDataManager.addToCart(product, quantity)
+            viewModel.addToCart(product, quantity)
 
             // Navigate to cart detail to show added item
             onNavigateToCart()
@@ -525,19 +527,19 @@ fun ProductDetailScreen(
         icon = Icons.Default.ShoppingCart
     )
 }
-//@Preview(showBackground = true)
-//@Composable
-//fun ProductDetailScreenPreview() {
-//    MaterialTheme {
-//        ProductDetailScreen(
-//            productId = "product_1",
-//            onAddToCart = { id, name, price ->
-//                println("Added to cart: $id, $name, $price")
-//            },
-//            onBackPressed = {
-//                println("Back pressed")
-//            },
-//            appDataManager = appDataManager
-//        )
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun ProductDetailScreenPreview() {
+    MaterialTheme {
+        ProductDetailScreen(
+            productId = "product_1",
+
+            onBackPressed = {
+                println("Back pressed")
+            },
+            onNavigateToCart = {
+                println("Navigate to cart")
+            }
+        )
+    }
+}

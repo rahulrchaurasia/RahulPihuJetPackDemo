@@ -7,6 +7,7 @@ import com.interstellar.rahulpihujetpackdemo.rootGraph.graph.Dest
 import com.interstellar.rahulpihujetpackdemo.rootGraph.graph.GlobalNavigationActions
 import com.interstellar.rahulpihujetpackdemo.rootGraph.navigation.AppDataManager
 import com.interstellar.rahulpihujetpackdemo.presentation.screen.LoginScreen
+import com.interstellar.rahulpihujetpackdemo.presentation.screen.RegisterScreen
 
 import com.interstellar.rahulpihujetpackdemo.presentation.screen.WelcomeScreen
 
@@ -60,11 +61,23 @@ fun NavGraphBuilder.authNavigation(
             onNavigateToRegister = {
                 globalActions.navigateToRegister()
             }
-//            onBackPressed = {
-//                globalActions.navigateBack()
-//            }
+
         )
     }
+
+    // ✅ ADD THIS - Register Screen (Also add this if you use navigateToRegister)
+        composable<Dest.Register>(
+        enterTransition = { NavigationAnimations.slideInRight },
+        exitTransition = { NavigationAnimations.slideOutLeft }
+    ) {
+            RegisterScreen(
+               onRegisterSuccess = {},
+                onBackClick = {
+                    globalActions.navigateBack()
+                }
+            )
+        }
+
 
     // ✅ ADD THIS - Register Screen (Also add this if you use navigateToRegister)
 //    composable<Dest.Register>(

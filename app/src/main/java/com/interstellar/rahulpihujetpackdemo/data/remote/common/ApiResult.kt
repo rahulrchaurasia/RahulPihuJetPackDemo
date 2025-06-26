@@ -1,4 +1,4 @@
-package com.interstellar.rahulpihujetpackdemo.data.local.model.common
+package com.interstellar.rahulpihujetpackdemo.data.remote.common
 
 sealed class ApiResult<out T> {
     data class Success<T>(val data: T) : ApiResult<T>()

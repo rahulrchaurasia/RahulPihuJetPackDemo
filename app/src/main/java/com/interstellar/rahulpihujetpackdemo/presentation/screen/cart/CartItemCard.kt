@@ -1,5 +1,6 @@
 package com.interstellar.rahulpihujetpackdemo.presentation.screen.cart
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.ui.tooling.preview.Preview
 
 import com.interstellar.rahulpihujetpackdemo.data.local.model.cart.CartItem
+import com.interstellar.rahulpihujetpackdemo.presentation.theme.AppColors
 
 // 2. CartItemCard.kt - Individual cart item component
 // Enhanced CartItemCard with quantity controls
@@ -33,9 +35,13 @@ fun CartItemCard(
     Card(
         onClick = onItemClick,
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.5.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+            containerColor = AppColors.cardGray
+        ),
+        border = BorderStroke(
+            width = 0.2.dp,
+            color = AppColors.cardBorderBlue
         )
     ) {
         Row(

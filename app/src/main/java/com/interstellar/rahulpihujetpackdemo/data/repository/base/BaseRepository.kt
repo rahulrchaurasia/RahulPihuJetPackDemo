@@ -1,10 +1,10 @@
 package com.interstellar.rahulpihujetpackdemo.data.repository.base
 
 import android.util.Log
-import com.interstellar.rahulpihujetpackdemo.data.local.model.common.ApiResult
-import com.interstellar.rahulpihujetpackdemo.data.local.model.exception.ApiException
-import com.interstellar.rahulpihujetpackdemo.data.local.model.exception.NetworkException
-import com.interstellar.rahulpihujetpackdemo.data.local.model.exception.TimeoutException
+import com.interstellar.rahulpihujetpackdemo.data.remote.common.ApiResult
+import com.interstellar.rahulpihujetpackdemo.data.remote.exception.ApiException
+import com.interstellar.rahulpihujetpackdemo.data.remote.exception.NetworkException
+import com.interstellar.rahulpihujetpackdemo.data.remote.exception.TimeoutException
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -32,7 +32,8 @@ abstract class BaseRepository {
             } else {
                 val errorMessage = response.errorBody()?.string() ?: "Unknown error"
                 Log.e("BaseRepository", "❌ API Error: ${response.code()} - $errorMessage")
-                emit(ApiResult.Error(
+                emit(
+                    ApiResult.Error(
                     ApiException(
                         message = errorMessage,
                         statusCode = response.code(),

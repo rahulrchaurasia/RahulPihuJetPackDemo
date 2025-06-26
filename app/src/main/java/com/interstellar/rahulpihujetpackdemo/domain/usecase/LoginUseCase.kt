@@ -1,14 +1,22 @@
 package com.interstellar.rahulpihujetpackdemo.domain.usecase
 
-import com.interstellar.rahulpihujetpackdemo.data.local.model.common.ApiResult
-import com.interstellar.rahulpihujetpackdemo.data.local.model.response.LoginResponse
+import com.interstellar.rahulpihujetpackdemo.data.remote.common.ApiResult
+import com.interstellar.rahulpihujetpackdemo.data.remote.response.login.LoginResponse
+import com.interstellar.rahulpihujetpackdemo.domain.repository.AuthRepository
 
-import com.interstellar.rahulpihujetpackdemo.data.repository.AuthRepository
+
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
+//Note : LoginUseCase depends on AuthRepository (interface)
+/*
+✅ Loosely coupled
+✅ Easy to test with fake/moc
+✅ Respects SOLID/DIP
+
+ */
 class LoginUseCase @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository  //<-- interface!
 ) {
     suspend operator fun invoke(
         mobile: String,
@@ -17,18 +25,10 @@ class LoginUseCase @Inject constructor(
 
         // Add validation logic here
         return authRepository.login(mobile, password)
-//        return if (validateInput(mobile, password)) {
-//            authRepository.login(mobile, password)
-//        } else {
-//            throw IllegalArgumentException("Invalid mobile number or password")
-//        }
+
     }
 
-//    private fun validateInput(mobile: String, password: String): Boolean {
-//        return mobile.isNotBlank() &&
-//                mobile.length == 10 &&
-//                mobile.all { it.isDigit() } &&
-//                password.isNotBlank() &&
-//                password.length >= 6
-//    }
+
+
+
 }

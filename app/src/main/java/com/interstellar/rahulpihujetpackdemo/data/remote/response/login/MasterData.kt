@@ -1,4 +1,4 @@
-package com.interstellar.rahulpihujetpackdemo.data.local.model.response
+package com.interstellar.rahulpihujetpackdemo.data.remote.response.login
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

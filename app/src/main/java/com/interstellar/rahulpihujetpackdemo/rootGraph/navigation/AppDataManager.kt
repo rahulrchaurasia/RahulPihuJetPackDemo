@@ -7,6 +7,7 @@ package com.interstellar.rahulpihujetpackdemo.rootGraph.navigation
 import kotlinx.coroutines.flow.asStateFlow
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -27,10 +28,11 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
+import javax.inject.Singleton
 
 
 //val Context.appDataStore: DataStore<Preferences> by preferencesDataStore(name = "app_preferences")
-
+@Singleton
 class AppDataManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val dataStore: DataStore<Preferences> // ✅ Hilt injects DataStore
@@ -326,10 +328,18 @@ class AppDataManager @Inject constructor(
     fun clearCart() {
         scope.launch {
             try {
+                Log.d("MYAPP", "🧹 Clearing cart now...")
                 _cartItems.value = emptyList()
+//                val currentItems = _cartItems.value.toMutableList()
+//                currentItems.clear()
+//                Log.d("MYAPP", "🧹Start Clearing cart now...")
+//                _cartItems.value = currentItems
+
                 updateCartMetrics()
                 saveCartToDataStore()
-                println("✅ Cart: Cleared all items")
+
+                Log.d("MYAPP", "🧹 Cart: Done Cleared all items\"...")
+
             } catch (e: Exception) {
                 println("❌ Cart: Error clearing cart - ${e.message}")
             }

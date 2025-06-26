@@ -18,124 +18,14 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.interstellar.rahulpihujetpackdemo.data.local.model.common.ApiResult
-import com.interstellar.rahulpihujetpackdemo.data.local.model.response.LoginResponse
+import com.interstellar.rahulpihujetpackdemo.data.remote.common.ApiResult
+import com.interstellar.rahulpihujetpackdemo.data.remote.response.login.LoginResponse
 import com.interstellar.rahulpihujetpackdemo.presentation.viewmodel.LoginViewModel
 import com.interstellar.rahulpihujetpackdemo.presentation.components.loading.LoadingConfig
 import com.interstellar.rahulpihujetpackdemo.presentation.components.loading.LoadingType
 import com.interstellar.rahulpihujetpackdemo.presentation.components.loading.UniversalLoading
 
 
-
-
-//@Composable
-//fun LoginScreen(
-//    onLoginSuccess: (String, String) -> Unit,
-//    onNavigateToRegister: () -> Unit,
-//    modifier: Modifier = Modifier,
-//    viewModel: LoginViewModel = hiltViewModel()
-//) {
-//    // UI State
-//    var mobile by remember { mutableStateOf("9224624994") }
-//    var password by remember { mutableStateOf("123456") }
-//    var passwordVisible by remember { mutableStateOf(false) }
-//    var showError by remember { mutableStateOf(false) }
-//    var errorDialogMessage by remember { mutableStateOf<String?>(null) }
-//
-//    // ViewModel State - Use ViewModel's isLoading directly
-//    val loginState by viewModel.loginState.collectAsState()
-//    val isLoading by viewModel.isLoading.collectAsState() // ← Direct from ViewModel
-//
-//
-//    // Handle only Success and Error
-//    LaunchedEffect(loginState) {
-//        when (val currentState = loginState) {
-//            is ApiResult.Success -> {
-//                Log.d("LoginScreen", "✅ Success response: ${currentState.data}")
-//                val response = currentState.data
-//
-//                if (response.status == "Success" && response.statusNo == 0) {
-//                    response.masterData?.let { masterData ->
-//                        Log.d("LoginScreen", "🚀 Calling onLoginSuccess with: ${masterData.emailId}, ${masterData.userId}")
-//                        onLoginSuccess(masterData.emailId, masterData.userId)
-//                    } ?: run {
-//                        Log.e("LoginScreen", "❌ MasterData is null")
-//                        errorDialogMessage = "Login successful but user data is missing"
-//                        showError = true
-//                    }
-//                } else {
-//                    Log.e("LoginScreen", "❌ Login failed with status: ${response.status}")
-//                    errorDialogMessage = response.message ?: "Login failed"
-//                    showError = true
-//                }
-//            }
-//            is ApiResult.Error -> {
-//                Log.e("LoginScreen", "❌ API Error: ${currentState.exception.message}")
-//                errorDialogMessage = currentState.exception.message
-//                showError = true
-//            }
-//            // ✅ No Loading case needed - handled by ViewModel's isLoading state
-//            else -> {
-//                // Handle other states silently
-//            }
-//        }
-//    }
-//
-//    // Use UniversalLoading with ViewModel's isLoading
-//    UniversalLoading(
-//        isLoading = isLoading, // ← Direct from ViewModel
-//        config = LoadingConfig(
-//            message = "Signing you in...",
-//            loadingType = LoadingType.CIRCULAR,
-//            showBackground = true
-//        )
-//    ) {
-//        LoginContent(
-//            mobile = mobile,
-//            onMobileChange = { newValue ->
-//                if (newValue.length <= 10 && newValue.all { char -> char.isDigit() }) {
-//                    mobile = newValue
-//                }
-//            },
-//            password = password,
-//            onPasswordChange = { password = it },
-//            passwordVisible = passwordVisible,
-//            onPasswordVisibilityChange = { passwordVisible = !passwordVisible },
-//            onLogin = {
-//                if (mobile.length == 10 && password.length >= 6) {
-//                    viewModel.login(mobile, password)
-//                }
-//            },
-//            onNavigateToRegister = onNavigateToRegister,
-//            isLoading = isLoading,
-//            loginState = loginState
-//        )
-//    }
-//
-//    // Error Dialog (same as before)
-//    if (showError && errorDialogMessage != null) {
-//        AlertDialog(
-//            onDismissRequest = {
-//                showError = false
-//                errorDialogMessage = null
-//                viewModel.clearError()
-//            },
-//            title = { Text("Login Failed") },
-//            text = { Text(errorDialogMessage ?: "An unknown error occurred") },
-//            confirmButton = {
-//                TextButton(
-//                    onClick = {
-//                        showError = false
-//                        errorDialogMessage = null
-//                        viewModel.clearError()
-//                    }
-//                ) {
-//                    Text("OK")
-//                }
-//            }
-//        )
-//    }
-//}
 
 
 @Composable
